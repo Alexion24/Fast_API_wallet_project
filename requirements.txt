@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+SQLAlchemy
+asyncpg
+alembic
+pydantic
+pytest
+httpx
+black
