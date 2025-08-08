@@ -5,15 +5,12 @@ echo "Waiting for database..."
 sleep 5
 
 if [ "$1" = "test" ]; then
-    echo "Creating test database..."
+    echo "Setting up test database..."
     PGPASSWORD=postgres psql -h db -U postgres -c "DROP DATABASE IF EXISTS test_wallet"
     PGPASSWORD=postgres psql -h db -U postgres -c "CREATE DATABASE test_wallet"
 
-    echo "Running migrations on test database..."
-    DATABASE_URL="postgresql+asyncpg://postgres:postgres@db:5432/test_wallet" alembic upgrade head
-
     echo "Running tests..."
-    pytest -v --cov=backend backend/tests/ --asyncio-mode=auto
+    python -m pytest -v backend/tests/
 elif [ "$1" = "app" ]; then
     echo "Running migrations..."
     alembic upgrade head
