@@ -26,6 +26,8 @@ services:
       DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/wallet
     ports:
       - "8000:8000"
+    entrypoint: ["./entrypoint.sh"]
+    command: ["app"]
 
   tests:
     build:
@@ -34,9 +36,13 @@ services:
     depends_on:
       db:
         condition: service_healthy
+      app:
+        condition: service_started
     environment:
+      APP_BASE_URL: "http://app:8000"
       DATABASE_URL: postgresql+asyncpg://postgres:postgres@db:5432/test_wallet
-    command: test
+    entrypoint: ["./entrypoint.sh"]
+    command: ["test"]
 
 volumes:
   wallet-db:

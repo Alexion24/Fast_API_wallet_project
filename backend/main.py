@@ -1,17 +1,21 @@
+from contextlib import asynccontextmanager
 from fastapi import FastAPI, HTTPException, Depends, Path
 from sqlalchemy.ext.asyncio import AsyncSession
 from decimal import Decimal
 import uuid
 
-from . import crud, schemas
-from .database import AsyncSessionLocal
-
-app = FastAPI()
+from . import crud, schemas, models
+from .database import engine, get_session
 
 
-async def get_session() -> AsyncSession:
-    async with AsyncSessionLocal() as session:
-        yield session
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    async with engine.begin() as conn:
+        await conn.run_sync(models.Base.metadata.create_all)
+    yield
+
+
+app = FastAPI(lifespan=lifespan)
 
 
 @app.post(
@@ -29,6 +33,7 @@ async def wallet_operation(
             Decimal(str(operation.amount)),
             operation.operation_type,
         )
+        await session.commit()
         return schemas.BalanceResponse(balance=float(wallet.balance))
     except ValueError as e:
         raise HTTPException(status_code=400, detail=str(e))

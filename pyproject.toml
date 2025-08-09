@@ -1,5 +1,0 @@
-[tool.pytest.ini_options]
-testpaths = ["backend/tests"]
-python_files = ["test_*.py"]
-addopts = "-v -s --tb=short"
-asyncio_mode = "auto"
